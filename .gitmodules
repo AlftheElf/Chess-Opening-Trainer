@@ -1,0 +1,8 @@
+[submodule "chess.js"]
+	path = chess.js
+	url = https://github.com/jhlywa/chess.js.git
+	branch = master
+[submodule "cm-chessboard"]
+	path = cm-chessboard
+	url = https://github.com/shaack/cm-chessboard.git
+	branch = master
