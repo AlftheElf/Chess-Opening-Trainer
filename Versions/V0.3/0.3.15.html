@@ -1,10 +1,7 @@
-<!-- Version 0.3.18 -->     
+<!-- Version 0.3.15 -->     
 <!-- 
 
-The Version in which I messed up the loop. It doesn't allow me to have another go when I get the question wrong, which is weird because that's exactly what it did before.
-BUGS:
-
-- When keyboard key is pressed again the text is displayed again, make it that it only does it the once. 
+The Version in which I add the html for the spans and buttons and things so I can learn how I can wait for a response.
 
 TODO:
 
@@ -12,16 +9,6 @@ TODO:
 - Do the master function
 - Continue copying from python
 - Eventually get the svg for checked kings (or learn how to add a red background).
-
-
-
-NOTES:
-
-Here are the stages:
-
-1) 
-
-
 
 
 Discoveries: 
@@ -44,14 +31,10 @@ The code that draws the board calls the line board.enableMoveInput(inputHandler,
     <title>Chess Opening Trainer</title>
     <meta name="viewport" content="width=device-width, user-scalable=yes, initial-scale=1.0"/>
     <link rel="stylesheet" href="/cm-chessboard/styles/cm-chessboard.css"/> 
-    <link rel="preconnect" href="https://fonts.gstatic.com">
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.2/chess.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
     <style type="text/css">
-
-        body{font-family: 'Montserrat', sans-serif;}
 
         /*#board{
             width: 800px; 
@@ -79,7 +62,6 @@ The code that draws the board calls the line board.enableMoveInput(inputHandler,
         #interface { 
             grid-area: 1 / 2 / 2 / 3; 
             border-style: solid;
-            border-width: thin;
             width: 400px;
             max-width: 400px;
         }
@@ -97,60 +79,23 @@ The code that draws the board calls the line board.enableMoveInput(inputHandler,
 <div class="grid-container">
   <div class="board" id="board"></div>
   <div id="interface">
-      <span id="prompt"></span>
-      <br><br>
-      <!-- <input type="button" id="button" onclick="buttonclick()" value="Continue"> -->
+      <p>Here is some text.</p>
   </div>
 </div>
 
 
 <script type="text/javascript">
 
-
 //SETTINGS
 
-var side = 'black' //select which side to play as
-
 var rating = '1600';
-var realistic = true;
-
-
-
-//Variables to define
-var state = "move";
-var bestMoveAnswer = null;
+var realistic = true; 
 
 //define functions
 
 function c(input){
     console.log(input)
 }
-
-
-//var clicked = false;
-// function buttonclick(){
-//     showAnswer()
-// }
-
-// This is how we keypress!
-
-var addEvent = document.addEventListener ? function(target,type,action){
-    if(target){
-        target.addEventListener(type,action,false);
-    }
-} : function(target,type,action){
-    if(target){
-        target.attachEvent('on' + type,action,false);
-    }
-}
-
-addEvent(document,'keydown',function(e){
-    e = e || window.event;
-    var key = e.which || e.keyCode;
-    if(key===13){
-        showAnswer();
-    }
-});
 
 function getJSON(FEN, type, rating=null) {
 
@@ -172,24 +117,8 @@ function getJSON(FEN, type, rating=null) {
     return jqXHR.responseJSON;
 }
 
-
-
-
-function showAnswer(){
-    var positionAnswer = "The answer is King\'s Pawn";
-    document.getElementById("prompt").innerHTML = positionAnswer;
-    //state = "questionBestMove";
-    setTimeout(() => {
-        document.getElementById("prompt").innerHTML = positionAnswer + "<br><br>What is " + side + "\'s best move?"
-        state = "questionBestMove";
-
-        //I will define the answer here, but really all this needs to be put in a better function
-        bestMoveAnswer = "e5";
-
-    }, 500)
-
-}
-
+// var object = getJSON("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", 'lichess', 1600);
+// console.log(object)
 
 function getOpponentMove(FEN){
         var data = getJSON(FEN,'lichess',rating);
@@ -260,9 +189,14 @@ function getOpeningName(){
 
 </script>
 
+
 <script type="module">
 
     var DATA;
+
+    var side = 'black' //select which side to play as
+
+
     
     import {INPUT_EVENT_TYPE, COLOR, Chessboard, MARKER_TYPE} from "/cm-chessboard/src/cm-chessboard/Chessboard.js"
     import {BORDER_TYPE} from "/cm-chessboard/src/cm-chessboard/Chessboard.js"
@@ -272,8 +206,10 @@ function getOpeningName(){
 
     function inputHandler(event) {
         console.log("event", event)
+        console.log("FEN C", chess.fen())
         event.chessboard.removeMarkers(undefined, MARKER_TYPE.dot)
 
+        console.log("FEN D", chess.fen())
 
         //Before move. Clicking about, and showing dot for possible moves and such.
         if (event.type === INPUT_EVENT_TYPE.moveStart) {
@@ -285,65 +221,31 @@ function getOpeningName(){
 
         //Here is once a move has been attempted    
         } else if (event.type === INPUT_EVENT_TYPE.moveDone) {
-
-            if (state == "questionBestMove"){
-
-                const move = {from: event.squareFrom, to: event.squareTo} //gets which move was attempted from event
-                const result = chess.move(move) //gets result of move
-
-                // console.log('move', move)
-                // console.log('result', result)
-                // console.log('result.san' ,result.san)
-                
-
-                //Makes moves for the player if it's valid
-
-
-                //we should probably distinguish between invalid move and incorrect move maybe
-
-                console.log('result', result)
-                if (result){console.log('if result', true)}else{console.log('if result', false)}
-
-                console.log('conditional', result.san == bestMoveAnswer)
-                //console.log('state', state)
-
-                //if (result.san == bestMoveAnswer) { //if result is anyting then we processed
-                if (result){
-                    if (result.san == bestMoveAnswer) {
-                        console.log('result.san', result.san)
-                        event.chessboard.disableMoveInput()
-                        event.chessboard.setPosition(chess.fen())
-
-                        document.getElementById("prompt").innerHTML = "";
-
-                        //Makes moves for the computer
-                        const possibleMoves = chess.moves({verbose: true})
-                        if (possibleMoves.length > 0) {
-                            const randomIndex = Math.floor(Math.random() * possibleMoves.length)
-                            const randomMove = possibleMoves[randomIndex]
-                            setTimeout(() => { // smoother with 500ms delay
-                                chess.move({from: randomMove.from, to: randomMove.to})
-                                if(side === 'white') {
-                                    event.chessboard.enableMoveInput(inputHandler, COLOR.white)
-                                }
-                                else {
-                                    event.chessboard.enableMoveInput(inputHandler, COLOR.black)
-                                }
-                                event.chessboard.setPosition(chess.fen())
-                            }, 500)
+            const move = {from: event.squareFrom, to: event.squareTo} //gets which move was attempted from event
+            const result = chess.move(move) //gets result of move
+            
+            if (result) { //if result is anyting then we processed
+                event.chessboard.disableMoveInput()
+                event.chessboard.setPosition(chess.fen())
+                const possibleMoves = chess.moves({verbose: true})
+                if (possibleMoves.length > 0) {
+                    const randomIndex = Math.floor(Math.random() * possibleMoves.length)
+                    const randomMove = possibleMoves[randomIndex]
+                    setTimeout(() => { // smoother with 500ms delay
+                        chess.move({from: randomMove.from, to: randomMove.to})
+                        if(side === 'white') {
+                            event.chessboard.enableMoveInput(inputHandler, COLOR.white)
                         }
-                    }else{
-                        console.warn("That move is not the answer")
-                    }
-                    return result
-                
-
-                } else { //If result returns null, then we will loop back to the begining of the function to have another go with new dots.
-                    console.warn("invalid move", move)
+                        else {
+                            event.chessboard.enableMoveInput(inputHandler, COLOR.black)
+                        }
+                        event.chessboard.setPosition(chess.fen())
+                    }, 500)
                 }
-                return result
-
+            } else { //If result returns null, then we will loop back to the begining of the function to have another go with new dots.
+                console.warn("invalid move", move)
             }
+            return result
         }
     }
 
@@ -367,6 +269,9 @@ function getOpeningName(){
 
         var nextMove = getOpponentMove(chess.fen());
 
+        console.log('chess_before' , chess)
+        console.log('board_before' , board)
+        console.log('FEN A', chess.fen())
 
         var boardTest;
 
@@ -374,15 +279,14 @@ function getOpeningName(){
             chess.move({from: nextMove.uci.slice(0,2), to: nextMove.uci.slice(2,4)})
             board.enableMoveInput(inputHandler, COLOR.black)
             board.setPosition(chess.fen())
-
-            //After setPosition we change state to questionPosition
-
-            state = "questionPosition";
-
-            document.getElementById("prompt").innerHTML = "What position is this?"
-
+            console.log('FEN E', chess.fen())
         }, 500)
 
+        console.log('chess_after' , chess)
+        console.log('board_after' , board)
+        console.log('FEN B', chess.fen())
+
+        console.log('nextMove', nextMove)
     }
 
 </script>

@@ -1,0 +1,173 @@
+<!-- Version 0.3.9 -->
+<!-- 
+
+The Version in which I now have a working UI and a working API.
+
+TODO:
+
+- Continue copying from python
+- Eventually get the svg for checked kings (or learn how to add a red background).
+
+
+Discoveries: 
+
+Once you get checkmate, the page stops.
+The order is like we run through the script so that the "board" is loaded with getElementFromID and things.
+Then the function keeps running because it's set up like a loop, but once checkmate is reached it halts.
+
+You only change the bottom bit with the "const board" to change the style and flip the board. 
+
+You can edit const chess = new Chess("r1bqkb1r/ppp2ppp/2n2n2/3pp3/3PP3/2N2N2/PPP2PPP/R1BQKB1R w KQkq - 4 5") to start at a specific FEN
+
+The code that draws the board calls the line board.enableMoveInput(inputHandler, COLOR.white); this is what calls the main game function. I believe we never leave the event handler afterthis.
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Chess Opening Trainer</title>
+    <meta name="viewport" content="width=device-width, user-scalable=yes, initial-scale=1.0"/>
+    <link rel="stylesheet" href="/cm-chessboard/styles/cm-chessboard.css"/> 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.2/chess.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+
+<div class="board" id="board" style="width: 800px; max-width: 800px"></div>
+
+<div id="output"></div>
+
+
+<script type="text/javascript">
+
+//define functions
+
+function c(input){
+    console.log(input)
+}
+
+// function getMoves(FEN, type, rating=null){
+
+//     if (type == 'lichess'){
+//         url = `https://explorer.lichess.ovh/lichess?topGames=0&moves=100&variant=standard&speeds[]=classical&ratings[]=${rating}&fen=${FEN.replaceAll(' ','%20')}`
+//     }
+//     if (type == 'master'){
+//         url = `https://explorer.lichess.ovh/master?topGames=0&moves=100&fen=${FEN.replaceAll(' ','%20')}`
+//     }
+
+//     $.getJSON(url, callback);
+
+//     function callback(data){
+//         var result = data
+//         //console.log(result)
+//     }
+// }
+
+// getMoves("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", 'master')
+
+
+function getMoves() {
+    var jqXHR = $.ajax({
+        url: "https://explorer.lichess.ovh/master?fen=rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR%20w%20KQkq%20-%200%201",
+        dataType: 'json',
+        async: false,
+        //success: function (data) {
+        //    callBack(data);}
+    });
+    return jqXHR.responseJSON;
+}
+
+var test = getMoves();
+console.log(test)
+
+
+</script>
+
+
+<script type="module">
+
+
+    var side = 'black' //select which side to play as
+
+    
+    import {INPUT_EVENT_TYPE, COLOR, Chessboard, MARKER_TYPE} from "/cm-chessboard/src/cm-chessboard/Chessboard.js"
+    import {BORDER_TYPE} from "/cm-chessboard/src/cm-chessboard/Chessboard.js"
+
+
+    const chess = new Chess() //Creates a new Chess() object. Add a FEN string as an argument to start from a FEN.
+
+    function inputHandler(event) {
+        console.log("event", event)
+        event.chessboard.removeMarkers(undefined, MARKER_TYPE.dot)
+
+        //Before move. Clicking about, and showing dot for possible moves and such.
+        if (event.type === INPUT_EVENT_TYPE.moveStart) {
+            const moves = chess.moves({square: event.square, verbose: true});
+            for (const move of moves) {
+                event.chessboard.addMarker(move.to, MARKER_TYPE.dot)
+            }
+            return moves.length > 0
+
+        //Here is once a move has been attempted    
+        } else if (event.type === INPUT_EVENT_TYPE.moveDone) {
+            const move = {from: event.squareFrom, to: event.squareTo} //gets which move was attempted from event
+            const result = chess.move(move) //gets result of move
+            
+            if (result) { //if result is anyting then we processed
+                event.chessboard.disableMoveInput()
+                event.chessboard.setPosition(chess.fen())
+                const possibleMoves = chess.moves({verbose: true})
+                if (possibleMoves.length > 0) {
+                    const randomIndex = Math.floor(Math.random() * possibleMoves.length)
+                    const randomMove = possibleMoves[randomIndex]
+                    setTimeout(() => { // smoother with 500ms delay
+                        chess.move({from: randomMove.from, to: randomMove.to})
+                        if(side === 'white') {
+                            event.chessboard.enableMoveInput(inputHandler, COLOR.white)
+                        }
+                        else {
+                            event.chessboard.enableMoveInput(inputHandler, COLOR.black)
+                        }
+                        event.chessboard.setPosition(chess.fen())
+                    }, 500)
+                }
+            } else { //If result returns null, then we will loop back to the begining of the function to have another go with new dots.
+                console.warn("invalid move", move)
+            }
+            return result
+        }
+    }
+
+
+    if (side == 'white'){
+        const board = new Chessboard(document.getElementById("board"), {
+            position: chess.fen(),
+            sprite: {url: "/cm-chessboard/assets/images/chessboard-sprite-staunty.svg"},
+            style: {moveMarker: MARKER_TYPE.square, hoverMarker: undefined},
+            orientation: COLOR.white
+        })
+        board.enableMoveInput(inputHandler, COLOR.white)
+    }
+    else{
+        const board = new Chessboard(document.getElementById("board"), {
+            position: chess.fen(),
+            sprite: {url: "/cm-chessboard/assets/images/chessboard-sprite-staunty.svg"},
+            style: {moveMarker: MARKER_TYPE.square, hoverMarker: undefined},
+            orientation: COLOR.black
+        })
+        const possibleMoves = chess.moves({verbose: true})
+        if (possibleMoves.length > 0) {
+            const randomIndex = Math.floor(Math.random() * possibleMoves.length)
+            const randomMove = possibleMoves[randomIndex]
+            setTimeout(() => { // smoother with 500ms delay
+                chess.move({from: randomMove.from, to: randomMove.to})
+                board.enableMoveInput(inputHandler, COLOR.black)
+                board.setPosition(chess.fen())
+            }, 500)
+        }
+    }
+
+</script>
+</body>
+</html>
