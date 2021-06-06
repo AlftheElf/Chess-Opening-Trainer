@@ -1,4 +1,4 @@
-<!-- Version 0.3.18 -->     
+<!-- Version 0.3.18_ -->     
 <!-- 
 
 The Version in which I messed up the loop. It doesn't allow me to have another go when I get the question wrong, which is weird because that's exactly what it did before.
@@ -43,7 +43,7 @@ The code that draws the board calls the line board.enableMoveInput(inputHandler,
     <meta charset="UTF-8">
     <title>Chess Opening Trainer</title>
     <meta name="viewport" content="width=device-width, user-scalable=yes, initial-scale=1.0"/>
-    <link rel="stylesheet" href="/cm-chessboard/styles/cm-chessboard.css"/> 
+    <link rel="stylesheet" href="../cm-chessboard/styles/cm-chessboard.css"/> 
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.2/chess.js"></script>
@@ -264,8 +264,8 @@ function getOpeningName(){
 
     var DATA;
     
-    import {INPUT_EVENT_TYPE, COLOR, Chessboard, MARKER_TYPE} from "/cm-chessboard/src/cm-chessboard/Chessboard.js"
-    import {BORDER_TYPE} from "/cm-chessboard/src/cm-chessboard/Chessboard.js"
+    import {INPUT_EVENT_TYPE, COLOR, Chessboard, MARKER_TYPE} from "../cm-chessboard/src/cm-chessboard/Chessboard.js"
+    import {BORDER_TYPE} from "../cm-chessboard/src/cm-chessboard/Chessboard.js"
 
 
     const chess = new Chess() //Creates a new Chess() object. Add a FEN string as an argument to start from a FEN.
@@ -351,7 +351,7 @@ function getOpeningName(){
     if (side == 'white'){
         const board = new Chessboard(document.getElementById("board"), {
             position: chess.fen(),
-            sprite: {url: "/cm-chessboard/assets/images/chessboard-sprite-staunty.svg"},
+            sprite: {url: "../cm-chessboard/assets/images/chessboard-sprite-staunty.svg"},
             style: {moveMarker: MARKER_TYPE.square, hoverMarker: undefined},
             orientation: COLOR.white
         })
@@ -360,7 +360,7 @@ function getOpeningName(){
     else{
         const board = new Chessboard(document.getElementById("board"), {
             position: chess.fen(),
-            sprite: {url: "/cm-chessboard/assets/images/chessboard-sprite-staunty.svg"},
+            sprite: {url: "../cm-chessboard/assets/images/chessboard-sprite-staunty.svg"},
             style: {moveMarker: MARKER_TYPE.square, hoverMarker: undefined},
             orientation: COLOR.black
         })
