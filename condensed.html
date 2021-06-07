@@ -3,10 +3,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <base href="https://alftheelf.github.io/Chess-Trainer/">
     <meta charset="UTF-8">
     <title>Chess Opening Trainer</title>
     <meta name="viewport" content="width=device-width, user-scalable=yes, initial-scale=1.0"/>
-    <link rel="stylesheet" href="https://alftheelf.github.com/Chess-Trainer/cm-chessboard/styles/cm-chessboard.css"/> 
+    <link rel="stylesheet" href="/cm-chessboard/styles/cm-chessboard.css"/> 
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.2/chess.js"></script>
@@ -35,8 +36,8 @@ function getBestMove(fen){
 
 
     
-    import {INPUT_EVENT_TYPE, COLOR, Chessboard, MARKER_TYPE} from "https://alftheelf.github.com/Chess-Trainer/cm-chessboard/src/cm-chessboard/Chessboard.js"
-    import {BORDER_TYPE} from "https://alftheelf.github.com/Chess-Trainer/cm-chessboard/src/cm-chessboard/Chessboard.js"
+    import {INPUT_EVENT_TYPE, COLOR, Chessboard, MARKER_TYPE} from "/cm-chessboard/src/cm-chessboard/Chessboard.js"
+    import {BORDER_TYPE} from "/cm-chessboard/src/cm-chessboard/Chessboard.js"
 
 
     const chess = new Chess() //Creates a new Chess() object. Add a FEN string as an argument to start from a paticular FEN.
@@ -96,7 +97,7 @@ function getBestMove(fen){
     if (side == 'white'){
         const board = new Chessboard(document.getElementById("board"), {
             position: chess.fen(),
-            sprite: {url: "https://alftheelf.github.com/Chess-Trainer/cm-chessboard/assets/images/chessboard-sprite-staunty.svg"},
+            sprite: {url: "/cm-chessboard/assets/images/chessboard-sprite-staunty.svg"},
             style: {moveMarker: MARKER_TYPE.square, hoverMarker: undefined},
             orientation: COLOR.white
         })
@@ -105,7 +106,7 @@ function getBestMove(fen){
     else{
         const board = new Chessboard(document.getElementById("board"), {
             position: chess.fen(),
-            sprite: {url: "https://alftheelf.github.com/Chess-Trainer/cm-chessboard/assets/images/chessboard-sprite-staunty.svg"},
+            sprite: {url: "/cm-chessboard/assets/images/chessboard-sprite-staunty.svg"},
             style: {moveMarker: MARKER_TYPE.square, hoverMarker: undefined},
             orientation: COLOR.black
         })
