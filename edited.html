@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <title>Chess Opening Trainer</title>
     <meta name="viewport" content="width=device-width, user-scalable=yes, initial-scale=1.0"/>
-    <link rel="stylesheet" href="https://alftheelf.github.com/Chess-Trainer/cm-chessboard/styles/cm-chessboard.css"/> 
+    <link rel="stylesheet" href="https://alftheelf.github.io/Chess-Trainer/cm-chessboard/styles/cm-chessboard.css"/> 
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.2/chess.js"></script>
@@ -17,6 +17,15 @@
 
 <div class="board" id="board" style="width: 800px; max-width: 800px;"></div>
 
+<script type="text/javascript">
+
+function getBestMove(fen){
+    //This function has been simplified
+    var bestMove = "e5"
+    return bestMove
+}
+
+</script>
 
 <script type="module">
 
@@ -26,8 +35,8 @@
 
 
     
-    import {INPUT_EVENT_TYPE, COLOR, Chessboard, MARKER_TYPE} from "https://alftheelf.github.com/Chess-Trainer/cm-chessboard/src/cm-chessboard/Chessboard.js"
-    import {BORDER_TYPE} from "https://alftheelf.github.com/Chess-Trainer/cm-chessboard/src/cm-chessboard/Chessboard.js"
+    import {INPUT_EVENT_TYPE, COLOR, Chessboard, MARKER_TYPE} from "https://alftheelf.github.io/Chess-Trainer/cm-chessboard/src/cm-chessboard/Chessboard.js"
+    import {BORDER_TYPE} from "https://alftheelf.github.io/Chess-Trainer/cm-chessboard/src/cm-chessboard/Chessboard.js"
 
 
     const chess = new Chess() //Creates a new Chess() object. Add a FEN string as an argument to start from a paticular FEN.
@@ -49,10 +58,14 @@
         } else if (event.type === INPUT_EVENT_TYPE.moveDone) {
             const move = {from: event.squareFrom, to: event.squareTo} //gets which move was attempted from event
             const result = chess.move(move) //gets result of move
-            
+
+            var correctAnswer = getBestMove(chess.fen());
+
+            if (result.san == correctAnswer){console.log('correct!')}else{console.log('Incorrect!')}
 
             //Makes moves for the player
-            if (result) { //if result is anyting then we processed
+            if (result && result.san == correctAnswer) { //if result is anyting then we processed
+
                 event.chessboard.disableMoveInput()
                 event.chessboard.setPosition(chess.fen())
 
@@ -72,7 +85,7 @@
                         event.chessboard.setPosition(chess.fen())
                     }, 500)
                 }
-            } else { //If result returns null, then we will loop back to the begining of the function to have another go with new dots.
+            } else { //If result returns null, then we will loop back to the begining of the function to have another go.
                 console.warn("invalid move", move)
             }
             return result
@@ -83,7 +96,7 @@
     if (side == 'white'){
         const board = new Chessboard(document.getElementById("board"), {
             position: chess.fen(),
-            sprite: {url: "https://alftheelf.github.com/Chess-Trainer/cm-chessboard/assets/images/chessboard-sprite-staunty.svg"},
+            sprite: {url: "https://alftheelf.github.io/Chess-Trainer/cm-chessboard/assets/images/chessboard-sprite-staunty.svg"},
             style: {moveMarker: MARKER_TYPE.square, hoverMarker: undefined},
             orientation: COLOR.white
         })
@@ -92,7 +105,7 @@
     else{
         const board = new Chessboard(document.getElementById("board"), {
             position: chess.fen(),
-            sprite: {url: "https://alftheelf.github.com/Chess-Trainer/cm-chessboard/assets/images/chessboard-sprite-staunty.svg"},
+            sprite: {url: "https://alftheelf.github.io/Chess-Trainer/cm-chessboard/assets/images/chessboard-sprite-staunty.svg"},
             style: {moveMarker: MARKER_TYPE.square, hoverMarker: undefined},
             orientation: COLOR.black
         })
