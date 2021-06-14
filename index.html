@@ -94,11 +94,8 @@ addEvent(document,'keydown',function(e){
 function keypress(){
     if (state == 'questionPosition') { //Then reveal the answer
 
-        if (positionAnswer) {
-            document.getElementById("prompt").innerHTML = positionAnswer;
-        }else{
-            positionAnswer = ""; //Change to blank string so it's not printed in the string below.
-        }
+        console.log(positionAnswer)
+        document.getElementById("prompt").innerHTML = positionAnswer;
 
         setTimeout(() => {
             document.getElementById("prompt").innerHTML = positionAnswer + "<br><br>What is " + side + "\'s best move?"
@@ -159,20 +156,12 @@ function keypress(){
                             event.chessboard.enableMoveInput(inputHandler, side[0])
                             event.chessboard.setPosition(chess.fen())
 
-                            if (positionAnswer){
+                            if (opponentMove.name){
                                 document.getElementById("prompt").innerHTML = "What position is this?";
                                 state = 'questionPosition';
                             }else{
-
-                            if (positionAnswer) {
-                                document.getElementById("prompt").innerHTML = positionAnswer;
-                            }else{
-                                positionAnswer = ""; //Change to blank string so it's not printed in the string below.
-                            }
-
-                            document.getElementById("prompt").innerHTML = positionAnswer + "<br><br>What is " + side + "\'s best move?"
-                            state = 'questionBestMove';
-
+                                document.getElementById("prompt").innerHTML = positionAnswer + "<br><br>What is " + side + "\'s best move?"
+                                state = 'questionBestMove';
                             }
 
                         }, 500)
