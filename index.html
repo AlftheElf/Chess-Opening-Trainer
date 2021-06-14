@@ -94,8 +94,10 @@ addEvent(document,'keydown',function(e){
 function keypress(){
     if (state == 'questionPosition') { //Then reveal the answer
 
-        if (positionAnswer == null) {
-            positionAnswer = "";
+        if (positionAnswer) {
+            document.getElementById("prompt").innerHTML = positionAnswer;
+        }else{
+            positionAnswer = ""; //Change to blank string so it's not printed in the string below.
         }
 
         setTimeout(() => {
@@ -162,12 +164,14 @@ function keypress(){
                                 state = 'questionPosition';
                             }else{
 
-                                if (positionAnswer == null){
-                                    positionAnswer == "";
-                                }
+                            if (positionAnswer) {
+                                document.getElementById("prompt").innerHTML = positionAnswer;
+                            }else{
+                                positionAnswer = ""; //Change to blank string so it's not printed in the string below.
+                            }
 
-                                document.getElementById("prompt").innerHTML = positionAnswer + "<br><br>What is " + side + "\'s best move?"
-                                state = 'questionBestMove';
+                            document.getElementById("prompt").innerHTML = positionAnswer + "<br><br>What is " + side + "\'s best move?"
+                            state = 'questionBestMove';
 
                             }
 
