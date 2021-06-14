@@ -1,10 +1,262 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta charset="utf-8">
+    <meta charset="UTF-8">
     <title>Chess Opening Trainer</title>
+    <meta name="viewport" content="width=device-width, user-scalable=yes, initial-scale=1.0"/>
+    <link rel="stylesheet" href="/cm-chessboard/styles/cm-chessboard.css"/> 
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.2/chess.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <style type="text/css">
+
+        body{font-family: 'Montserrat', sans-serif;}
+
+        .grid-container {
+        display: grid;
+        grid-template-columns: 1fr 0.6fr;
+        grid-template-rows: 1fr;
+        gap: 0px 0px;
+        }
+
+        .board {
+            grid-area: 1 / 1 / 2 / 3;
+            width: 800px;
+            max-width: 800px;
+        }
+        #interface { 
+            grid-area: 1 / 2 / 2 / 3; 
+            border-style: solid;
+            border-width: thin;
+            width: 400px;
+            max-width: 400px;
+        }
+
+        p{
+            width: 100%;
+            align: center;
+        }
+
+    </style>
 </head>
 <body>
-This is a test.
+
+
+<div class="grid-container">
+  <div class="board" id="board"></div>
+  <div id="interface">
+      <span id="prompt"></span>
+  </div>
+</div>
+
+
+<script type="text/javascript">
+
+
+//SETTINGS
+
+var rating = '1600';
+var realistic = true;
+var limit = 50;
+
+
+//Define initial variables
+var side = 'black' //select which side to play as
+var state = null;
+var moveCount = 0;
+if (side == 'black') {var notSide = 'white'} else{var notSide = 'black'}
+var positionAnswer
+var PGN
+
+
+//define functions
+
+var addEvent = document.addEventListener ? function(target,type,action){
+    if(target){
+        target.addEventListener(type,action,false);
+    }
+} : function(target,type,action){
+    if(target){
+        target.attachEvent('on' + type,action,false);
+    }
+}
+
+addEvent(document,'keydown',function(e){
+    e = e || window.event;
+    var key = e.which || e.keyCode;
+    if(key===13){ //Space is key 32
+        keypress()
+    }
+});
+
+function keypress(){
+    if (state == 'questionPosition') { //Then reveal the answer
+
+        console.log(positionAnswer)
+        document.getElementById("prompt").innerHTML = positionAnswer;
+
+        setTimeout(() => {
+            document.getElementById("prompt").innerHTML = positionAnswer + "<br><br>What is " + side + "\'s best move?"
+            state = "questionBestMove";
+        }, 500)
+    }
+}
+
+
+</script>
+
+<script type="module">
+    
+    import {INPUT_EVENT_TYPE, COLOR, Chessboard, MARKER_TYPE} from "/cm-chessboard/src/cm-chessboard/Chessboard.js"
+    import {BORDER_TYPE} from "/cm-chessboard/src/cm-chessboard/Chessboard.js"
+
+    const chess = new Chess() //Creates a new Chess() object. Add a FEN string as an argument to start from a FEN.
+
+    function inputHandler(event) {
+        console.log("event", event)
+        event.chessboard.removeMarkers(undefined, MARKER_TYPE.dot)
+
+
+        //Before move. Clicking about, and showing dot for possible moves and such.
+        if (event.type === INPUT_EVENT_TYPE.moveStart) {
+            const moves = chess.moves({square: event.square, verbose: true});
+            for (const move of moves) {
+                event.chessboard.addMarker(move.to, MARKER_TYPE.dot)
+            }
+            return moves.length > 0
+
+        //Here is once a move has been attempted    
+        } else if (event.type === INPUT_EVENT_TYPE.moveDone) {
+
+            if (state == "questionBestMove") {
+
+                const move = {from: event.squareFrom, to: event.squareTo} //gets which move was attempted from event
+                const result = chess.move(move) //gets result of move
+
+                var bestMove = PGN[moveCount];
+
+                if (result){
+                    if (result.san == bestMove.san) {
+
+                        moveCount += 1;
+
+                        event.chessboard.disableMoveInput()
+                        event.chessboard.setPosition(chess.fen())
+
+                        document.getElementById("prompt").innerHTML = "";
+
+                        var opponentMove = PGN[moveCount];
+                        positionAnswer = PGN[moveCount].name;
+                        moveCount += 1;
+
+                        setTimeout(() => { // smoother with 500ms delay
+                            chess.move({from: opponentMove.uci.slice(0,2), to: opponentMove.uci.slice(2,4)})
+                            event.chessboard.enableMoveInput(inputHandler, side[0])
+                            event.chessboard.setPosition(chess.fen())
+
+                            if (opponentMove.name){
+                                document.getElementById("prompt").innerHTML = "What position is this?";
+                                state = 'questionPosition';
+                            }else{
+                                document.getElementById("prompt").innerHTML = positionAnswer + "<br><br>What is " + side + "\'s best move?"
+                                state = 'questionBestMove';
+                            }
+
+                        }, 500)
+
+                    }else{
+                        console.warn("That move is not the answer")
+                        chess.undo();
+                        event.chessboard.setPosition(chess.fen());
+                    }
+                    return result
+                
+
+                } else { //If result returns null, then we will loop back to the begining of the function to have another go with new dots.
+                    console.warn("invalid move", move)
+                }
+                return result
+            }
+
+        }
+    }
+
+    // The PGN is entered manually here. Normally this would be extracted from the Lichess API.
+    if (side == 'black') {
+    
+        PGN = [
+            {uci: "e2e4", san: "e4", name: "King's Pawn"},
+            {uci: "e7e5", san: "e5", name: "King's Pawn Game"},
+            {uci: "g1f3", san: "Nf3", name: "King's Knight Opening"},
+            {uci: "b8c6", san: "Nc6", name: "King's Knight Opening: Normal Variation"},
+            {uci: "f1b5", san: "Bb5", name: "Ruy Lopez"},
+            {uci: "a7a6", san: "a6", name: "Ruy Lopez: Morphy Defense"},
+            {uci: "b5c6", san: "Bxc6", name: "Ruy Lopez: Exchange Variation"},
+            {uci: "d7c6", san: "dxc6", name: null},
+            {uci: "b1c3", san: "Nc3", name: "Ruy Lopez: Exchange Variation, Keres Variation"},
+            {uci: "f7f6", san: "f6", name: null},
+            {uci: "e1h1", san: "O-O", name: null}
+        ]
+    }else{
+
+        PGN = [
+            {uci: "e2e4", san: "e4", name: "King's Pawn"},
+            {uci: "e7e5", san: "e5", name: "King's Pawn Game"},
+            {uci: "g1f3", san: "Nf3", name: "King's Knight Opening"},
+            {uci: "b8c6", san: "Nc6", name: "King's Knight Opening: Normal Variation"},
+            {uci: "f1b5", san: "Bb5", name: "Ruy Lopez"},
+            {uci: "a7a6", san: "a6", name: "Ruy Lopez: Morphy Defense"},
+            {uci: "b5a4", san: "Ba4", name: null},
+            {uci: "b7b5", san: "b5", name: "Ruy Lopez: Morphy Defense, Caro Variation"},
+            {uci: "a4b3", san: "Bb3", name: null},
+            {uci: "g8f6", san: "Nf6", name: null},
+            {uci: "e1h1", san: "O-O", name: null}
+        ]
+    }
+
+    console.log('PGN', PGN)
+
+    if (side == 'white'){
+        const board = new Chessboard(document.getElementById("board"), {
+            position: chess.fen(),
+            sprite: {url: "/cm-chessboard/assets/images/chessboard-sprite-staunty.svg"},
+            style: {moveMarker: MARKER_TYPE.square, hoverMarker: undefined},
+            orientation: COLOR.white
+        })
+        board.enableMoveInput(inputHandler, COLOR.white)
+    }
+    else{
+        const board = new Chessboard(document.getElementById("board"), {
+            position: chess.fen(),
+            sprite: {url: "/cm-chessboard/assets/images/chessboard-sprite-staunty.svg"},
+            style: {moveMarker: MARKER_TYPE.square, hoverMarker: undefined},
+            orientation: COLOR.black
+        })
+
+
+        //Get opponent move and name
+        var opponentMove = PGN[moveCount];
+        positionAnswer = PGN[moveCount].name;
+
+        moveCount += 1;
+
+        setTimeout(() => { // smoother with 500ms delay
+            chess.move({from: opponentMove.uci.slice(0,2), to: opponentMove.uci.slice(2,4)})
+            board.enableMoveInput(inputHandler, COLOR.black)
+            board.setPosition(chess.fen())
+            
+            if (opponentMove.name){
+            
+                document.getElementById("prompt").innerHTML = "What position is this?"
+                state = "questionPosition"
+            }
+
+        }, 500)
+
+    }
+
+</script>
 </body>
 </html>
