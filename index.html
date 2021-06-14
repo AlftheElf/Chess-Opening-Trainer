@@ -94,8 +94,9 @@ addEvent(document,'keydown',function(e){
 function keypress(){
     if (state == 'questionPosition') { //Then reveal the answer
 
-        console.log(positionAnswer)
-        document.getElementById("prompt").innerHTML = positionAnswer;
+        if (positionAnswer) {
+            document.getElementById("prompt").innerHTML = positionAnswer;
+        }
 
         setTimeout(() => {
             document.getElementById("prompt").innerHTML = positionAnswer + "<br><br>What is " + side + "\'s best move?"
