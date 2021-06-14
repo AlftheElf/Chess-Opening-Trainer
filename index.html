@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>Chess Opening Trainer</title>
     <meta name="viewport" content="width=device-width, user-scalable=yes, initial-scale=1.0"/>
-    <link rel="stylesheet" href="https://github.io/alftheelf/Chess-Opening-Trainer/cm-chessboard/styles/cm-chessboard.css"/> 
+    <link rel="stylesheet" href="https://alftheelf.github.io/Chess-Opening-Trainer/cm-chessboard/styles/cm-chessboard.css"/> 
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.2/chess.js"></script>
@@ -109,8 +109,8 @@ function keypress(){
 
 <script type="module">
     
-    import {INPUT_EVENT_TYPE, COLOR, Chessboard, MARKER_TYPE} from "https://github.io/alftheelf/Chess-Opening-Trainer/cm-chessboard/src/cm-chessboard/Chessboard.js"
-    import {BORDER_TYPE} from "https://github.io/alftheelf/Chess-Opening-Trainer/cm-chessboard/src/cm-chessboard/Chessboard.js"
+    import {INPUT_EVENT_TYPE, COLOR, Chessboard, MARKER_TYPE} from "https://alftheelf.github.io/Chess-Opening-Trainer/cm-chessboard/src/cm-chessboard/Chessboard.js"
+    import {BORDER_TYPE} from "https://alftheelf.github.io/Chess-Opening-Trainer/cm-chessboard/src/cm-chessboard/Chessboard.js"
 
     const chess = new Chess() //Creates a new Chess() object. Add a FEN string as an argument to start from a FEN.
 
@@ -221,7 +221,7 @@ function keypress(){
     if (side == 'white'){
         const board = new Chessboard(document.getElementById("board"), {
             position: chess.fen(),
-            sprite: {url: "https://github.io/alftheelf/Chess-Opening-Trainer/cm-chessboard/assets/images/chessboard-sprite-staunty.svg"},
+            sprite: {url: "https://alftheelf.github.io/Chess-Opening-Trainer/cm-chessboard/assets/images/chessboard-sprite-staunty.svg"},
             style: {moveMarker: MARKER_TYPE.square, hoverMarker: undefined},
             orientation: COLOR.white
         })
@@ -230,7 +230,7 @@ function keypress(){
     else{
         const board = new Chessboard(document.getElementById("board"), {
             position: chess.fen(),
-            sprite: {url: "https://github.io/alftheelf/Chess-Opening-Trainer/cm-chessboard/assets/images/chessboard-sprite-staunty.svg"},
+            sprite: {url: "https://alftheelf.github.io/Chess-Opening-Trainer/cm-chessboard/assets/images/chessboard-sprite-staunty.svg"},
             style: {moveMarker: MARKER_TYPE.square, hoverMarker: undefined},
             orientation: COLOR.black
         })
