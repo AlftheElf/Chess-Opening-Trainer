@@ -89,7 +89,7 @@ var addEvent = document.addEventListener ? function(target,type,action){
 addEvent(document,'keydown',function(e){
     e = e || window.event;
     var key = e.which || e.keyCode;
-    if(key===13){ //Space is key 32
+    if(key===13){ //Press the return key
         keypress()
     }
 });
@@ -253,7 +253,7 @@ function keypress(){
             
             if (positionAnswer){
             
-                document.getElementById("prompt").innerHTML = "What position is this?";
+                document.getElementById("prompt").innerHTML = "Press the return key to reveal answer. <br><br>What position is this?";
                 state = "questionPosition"
             }
 
