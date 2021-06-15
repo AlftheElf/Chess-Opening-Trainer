@@ -100,7 +100,7 @@ function keypress(){
         document.getElementById("prompt").innerHTML = positionAnswer;
 
         setTimeout(() => {
-            document.getElementById("prompt").innerHTML = positionAnswer + "<br><br>key) What is " + side + "\'s best move?"
+            document.getElementById("prompt").innerHTML = positionAnswer + "<br><br>What is " + side + "\'s best move?"
             state = "questionBestMove";
         }, 500)
     }
@@ -161,10 +161,10 @@ function keypress(){
                             event.chessboard.setPosition(chess.fen())
 
                             if (positionAnswer){
-                                document.getElementById("prompt").innerHTML = "event) What position is this?";
+                                document.getElementById("prompt").innerHTML = "What position is this?";
                                 state = 'questionPosition';
                             }else{
-                                document.getElementById("prompt").innerHTML = "key) What is " + side + "\'s best move?"
+                                document.getElementById("prompt").innerHTML = "What is " + side + "\'s best move?"
                             }
 
                         }, 500)
