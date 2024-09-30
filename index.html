@@ -1,4 +1,4 @@
-<!-- Version 1.0.7 -->     
+<!-- Version 1.0.0 -->
 
 <!DOCTYPE html>
 <html lang="en">
@@ -7,8 +7,8 @@
     <title>Chess Opening Trainer</title>
     <meta name="viewport" content="width=device-width, user-scalable=yes, initial-scale=1.0"/>
     
-    <link rel="stylesheet" href="https://alftheelf.github.io/Chess-Opening-Trainer/cm-chessboard/styles/cm-chessboard.css"/>
-    <!-- <link rel="stylesheet" href="/cm-chessboard/styles/cm-chessboard.css"/> -->
+    <link rel="stylesheet" href="https://alftheelf.github.io/Chess-Opening-Trainer/cm-chessboard/styles/cm-chessboard.css"/> 
+    <!-- <link rel="stylesheet" href="/cm-chessboard/styles/cm-chessboard.css"/>  -->
 
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
@@ -69,23 +69,23 @@ import {BORDER_TYPE} from "https://alftheelf.github.io/Chess-Opening-Trainer/cm-
 
 //SETTINGS
 
-var randomSide = false;
+var side = 'black' //select which side to play as
 var rating = '1600';
 var realistic = true;
 var limit = 50;
 
-if (randomSide) {
-    var randomBoolean = Math.random() < 0.5;
-    if (randomBoolean) {var side = 'white'}else{var side = 'black'}  
+//create initial PGN object
+if (side == 'black'){
+    var PGN = [];
 }else{
-    var side = 'white' //select which side to play as
+    var PGN = [
+        {uci: "e2e4", san: "e4", name: "King\'s Pawn"}
+    ]
 }
-if (side == 'black') {var notSide = 'white'} else{var notSide = 'black'}
-
-//define initial variables
 
 var state
 var moveCount = 0;
+if (side == 'black') {var notSide = 'white'} else{var notSide = 'black'}
 var computerName
 var playerName
 var bestMove
@@ -93,7 +93,6 @@ var opponentMove
 var PGN
 var board
 var chess
-var chess1
 var chessEvent
 var event2
 var inputHandler1
@@ -133,12 +132,12 @@ function keypress(){
             setTimeout(() => {
             
                 document.getElementById("prompt").innerHTML = computerName + "<br><br>What is " + side + "\'s best move?";
-                console.log("What is " + side + "\'s best move?")
+                console.log("154) What is " + side + "\'s best move?")
                 state = "questionBestMove";
             }, 500)
         }else{
             console.warn('END')
-            document.getElementById("prompt").innerHTML = computerName + "<br><br>Press 'N' key to restart";
+            document.getElementById("prompt").innerHTML = "Press 'N' key to restart";
             state = 'end';
         }
 
@@ -147,33 +146,32 @@ function keypress(){
 
         document.getElementById("prompt").innerHTML = playerName;
 
-        if (end == false) {
+        setTimeout(() => { // smoother with 500ms delay
 
-            setTimeout(() => { // smoother with 500ms delay
+            console.log(moveCount)
+            opponentMove = PGN[moveCount];
+            computerName = PGN[moveCount].name;
 
-                opponentMove = PGN[moveCount];
-                computerName = PGN[moveCount].name;
+            //make the move
+            chess.move({from: opponentMove.uci.slice(0,2), to: opponentMove.uci.slice(2,4)})
+            event2.chessboard.enableMoveInput(inputHandler1, side[0])
+            event2.chessboard.setPosition(chess.fen())
 
-                //make the move
-                chess.move({from: opponentMove.uci.slice(0,2), to: opponentMove.uci.slice(2,4)})
-                event2.chessboard.enableMoveInput(inputHandler1, side[0])
-                event2.chessboard.setPosition(chess.fen())
+            moveCount += 1;
+            if (moveCount >= PGN.length) {end = true;}
 
-                moveCount += 1;
-                if (moveCount >= PGN.length) {end = true;}
-
-                //ask the question
-                if (computerName) {
-                    document.getElementById("prompt").innerHTML = playerName + "<br><br>What position is this?";
-                    console.log("What position is this?")
-                    state = 'questionComputer';
-                }else{
-                    document.getElementById("prompt").innerHTML = "What is " + side + "\'s best move?";
-                    console.log("What is " + side + "\'s best move?")
-                    state = 'questionBestMove';
-                }
-            }, 500)
-        }
+            //ask the question
+            if (computerName) {
+                document.getElementById("prompt").innerHTML = playerName + "<br><br>What position is this?";
+                console.log("3) "+playerName + "<br><br>What position is this?")
+                state = 'questionComputer';
+            }else{
+                console.log('171')
+                document.getElementById("prompt").innerHTML = "What is " + side + "\'s best move?";
+                console.log("185) What is " + side + "\'s best move?")
+                state = 'questionBestMove';
+            }
+        }, 500)
     }
 }
 
@@ -215,12 +213,8 @@ function getJSON(FEN, type, rating=null) {
 
 function getData(){
 
-    if (side == 'white') {
-        chess1 = new Chess('rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1');
-    }else{
-        chess1 = new Chess();
-    }
-    
+    const chess1 = new Chess();
+
     while(true){
 
         //Step 1:
@@ -228,9 +222,9 @@ function getData(){
         var opponentMove = getOpponentData(chess1.fen())
 
         if (opponentMove){
-            opponentMove.dataType = 'lichess';
             PGN.push(opponentMove);
         }else{
+            //console.log('getData(): PGN',PGN)
             return PGN
         }
 
@@ -242,9 +236,9 @@ function getData(){
         //Get best move
         var bestMove = getBestMove(chess1.fen())
         if (bestMove){
-            bestMove.dataType = 'master';
             PGN.push(bestMove);
         }else{
+            //console.log('getData(): PGN',PGN)
             return PGN
         }
 
@@ -380,11 +374,6 @@ function main(){
     document.getElementById('board').innerHTML = null;
     document.getElementById('prompt').innerHTML = null;
 
-    if (randomSide) {
-        var randomBoolean = Math.random() < 0.5;
-        if (randomBoolean) {side = 'white'}else{side = 'black'}
-    }
-
     //Define global variables
 
     //create initial PGN object
@@ -392,7 +381,7 @@ function main(){
         PGN = [];
     }else{
         PGN = [
-            {uci: "e2e4", san: "e4", name: "King\'s Pawn", dataType: "manual"}
+            {uci: "e2e4", san: "e4", name: "King\'s Pawn"}
         ]
     }
 
@@ -401,6 +390,58 @@ function main(){
     end = false;
 
     chess = new Chess() //Creates a new Chess() object. Add a FEN string as an argument to start from a FEN.
+
+    PGN = getData();
+    console.log('PGN', PGN)
+
+    if (side == 'white'){
+        board = new Chessboard(document.getElementById("board"), {
+            position: chess.fen(),
+            sprite: {url: "https://alftheelf.github.io/Chess-Opening-Trainer/cm-chessboard/assets/images/chessboard-sprite-staunty.svg"},
+            // sprite: {url: "/cm-chessboard/assets/images/chessboard-sprite-staunty.svg"},
+
+            style: {moveMarker: MARKER_TYPE.square, hoverMarker: undefined},
+            orientation: COLOR.white
+        })
+        state = 'questionBestMove';
+        document.getElementById("prompt").innerHTML = "What is " + side + "\'s best move?";
+        board.enableMoveInput(inputHandler1, COLOR.white)
+    }
+    else{
+        board = new Chessboard(document.getElementById("board"), {
+            position: chess.fen(),
+            sprite: {url: "https://alftheelf.github.io/Chess-Opening-Trainer/cm-chessboard/assets/images/chessboard-sprite-staunty.svg"},
+            // sprite: {url: "/cm-chessboard/assets/images/chessboard-sprite-staunty.svg"},
+
+            style: {moveMarker: MARKER_TYPE.square, hoverMarker: undefined},
+            orientation: COLOR.black
+        })
+
+        //Get opponent move and name
+        opponentMove = PGN[moveCount];
+        computerName = PGN[moveCount].name;
+
+        moveCount += 1;
+        if (moveCount >= PGN.length) {end = true;}
+
+        setTimeout(() => { // smoother with 500ms delay
+            chess.move({from: opponentMove.uci.slice(0,2), to: opponentMove.uci.slice(2,4)})
+            board.enableMoveInput(inputHandler1, COLOR.black)
+            board.setPosition(chess.fen())
+            
+            if (computerName){
+            
+                document.getElementById("prompt").innerHTML = "What position is this?";
+                console.log("1) What position is this?")
+                state = "questionComputer"
+            }else{
+                document.getElementById("prompt").innerHTML = "What is " + side + "\'s best move?";
+                state = "getBestMove";
+            }
+
+        }, 500)
+
+    }
 
     inputHandler1 = function inputHandler(chessEvent) {
         console.log("chessEvent", chessEvent)
@@ -442,7 +483,7 @@ function main(){
 
                             if (playerName) {
                                 document.getElementById("prompt").innerHTML = "What position is this?";
-                                console.log("What position is this?")
+                                console.log("5) What position is this?")
                                 state = "questionPlayer";
                             }else{
                                 if (end == false) {
@@ -458,21 +499,29 @@ function main(){
                                     moveCount += 1;
                                     if (moveCount >= PGN.length) {end = true;}
 
+                                    if (end == false) {
+
                                     //ask the question
-                                    if (computerName) {
-                                        document.getElementById("prompt").innerHTML = "What position is this?";
-                                        console.log("What position is this?")
-                                        state = 'questionComputer';
-                                    }else{
-                                        if (end == false) {
+                                        if (computerName) {
+                                            document.getElementById("prompt").innerHTML = "What position is this?";
+                                            console.log("6) What position is this?")
+                                            state = 'questionComputer';
+                                        }else{
                                             //Maybe we need something here, maybe not.
+                                            console.log('245')
                                             document.getElementById("prompt").innerHTML = "What is " + side + "\'s best move?";
-                                            console.log("What is " + side + "\'s best move?")
+                                            console.log("8) What is " + side + "\'s best move?")
                                             state = 'questionBestMove';
                                         }
+                                    }else{
+                                        console.warn('11) END')
+                                        //document.getElementById("prompt").innerHTML = "END";
+                                        document.getElementById("prompt").innerHTML = "Press 'N' key to restart";
+                                        state = 'end'
                                     }
                                 }else{
-                                    console.warn('END')
+                                    console.warn('9) END')
+                                    //document.getElementById("prompt").innerHTML = "END";
                                     document.getElementById("prompt").innerHTML = "Press 'N' key to restart";
                                     state = 'end';
                                 }
@@ -493,68 +542,12 @@ function main(){
                 }
             }
         }else{
-            console.warn('END')
+            console.warn('10) END')
+            //document.getElementById("prompt").innerHTML = "END";
             document.getElementById("prompt").innerHTML = "Press 'N' key to restart";
             state = 'end';
         }
     }
-
-    //PGN = getData();
-    
-    PGN = [
-        {uci: "e2e4", san: "e4", name: "King's Pawn", dataType: "manual"},
-        {uci: "e7e5", san: "e5", name: "King's Pawn Game", dataType: "lichess"},
-        {uci: "g1f3", san: "Nf3", name: "King's Knight Opening", dataType: "master"},
-        {uci: "d7d5", san: "d5", name: "Elephant Gambit", dataType: "lichess"},
-        {uci: "e4d5", san: "exd5", name: null, dataType: "master"},
-        {uci: "e5e4", san: "e4", name: "Elephant Gambit: Paulsen Countergambit", dataType: "lichess"}
-    ]
-
-    console.log('PGN', PGN)
-
-    if (side == 'white'){
-        board = new Chessboard(document.getElementById("board"), {
-            position: chess.fen(),
-            sprite: {url: "https://alftheelf.github.io/Chess-Opening-Trainer/cm-chessboard/assets/images/chessboard-sprite-staunty.svg"},
-            // sprite: {url: "/cm-chessboard/assets/images/chessboard-sprite-staunty.svg"},
-            style: {moveMarker: MARKER_TYPE.square, hoverMarker: undefined},
-            orientation: COLOR.white
-        })
-        state = 'questionBestMove';
-        document.getElementById("prompt").innerHTML = "What is " + side + "\'s best move?";
-        board.enableMoveInput(inputHandler1, COLOR.white)
-    }
-    else{
-        board = new Chessboard(document.getElementById("board"), {
-            position: chess.fen(),
-            sprite: {url: "https://alftheelf.github.io/Chess-Opening-Trainer/cm-chessboard/assets/images/chessboard-sprite-staunty.svg"},
-            // sprite: {url: "/cm-chessboard/assets/images/chessboard-sprite-staunty.svg"},
-            style: {moveMarker: MARKER_TYPE.square, hoverMarker: undefined},
-            orientation: COLOR.black
-        })
-
-        //Get opponent move and name
-        opponentMove = PGN[moveCount];
-        computerName = PGN[moveCount].name;
-
-        moveCount += 1;
-        if (moveCount >= PGN.length) {end = true;}
-
-        setTimeout(() => { // smoother with 500ms delay
-            chess.move({from: opponentMove.uci.slice(0,2), to: opponentMove.uci.slice(2,4)})
-            board.enableMoveInput(inputHandler1, COLOR.black)
-            board.setPosition(chess.fen())
-            
-            if (computerName){
-                document.getElementById("prompt").innerHTML = "What position is this?";
-                console.log("What position is this?")
-                state = "questionComputer"
-            }else{
-                document.getElementById("prompt").innerHTML = "What is " + side + "\'s best move?";
-                state = "getBestMove";
-            }
-        }, 500)
-    } 
 }
 
 main();
